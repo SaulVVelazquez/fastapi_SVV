@@ -1,15 +1,15 @@
 
 from fastapi import FastAPI
 import sqlite3
-from typing import list
+from typing import List
 from pydantic import BaseModel
 from fastapi import HTTPException,status
 
 
-class Mensaje(Base Model):
+class Mensaje(BaseModel):
 	mensaje:str
 
-class Contactos(Base Model):
+class Contactos(BaseModel):
 	id_contacto:int
 	nombre:str
 	email:str
@@ -24,8 +24,8 @@ app= Fast API(
 	title="contactos API REST",
 	description=description,
 	version= "0.1",
-	contact= {"name":"Jesus Yael",
-		"email":"1721110698@utectulancingo.edu.mx"
+	contact= {"name":"Saul Valde3rrama Velazquez",
+		"email":"1721110050@utectulancingo.edu.mx"
 	}
 			
 )
@@ -43,7 +43,7 @@ async dif read_root():
 
 @app.get(
 	"/contactos/",
-	response_model= List[contactos],
+	response_model= List[Contactos],
 	status_code= status.HTTP_202_ACCEPTED,
 	summary="lista de contactos",
 	description="endpoint que regresara un array con todos los contactos",
@@ -53,10 +53,10 @@ async dif get_contactos():
 		with sqlite3.connect("API/sql/contactos.db") as connection:
 		connection.row_factory=sqlite3.Row
 		cursor=connection.cursor()
-		cursor.execute(SELECT id_contacto,nombre,email,telefono FROM contactos;")
+		cursor.execute("SELECT  id_contacto,nombre,email,telefono FROM contactos;")
 		response=cursor.Fetchall()
 		return response
-	exept Exeception as error:
+	excecpt Exeception as error:
 		print (f "Error en get_cotactos {error.asgs}")
 		raise HTTPException(
 		status_code=status.HTTP_400_BAD_REQUEST,

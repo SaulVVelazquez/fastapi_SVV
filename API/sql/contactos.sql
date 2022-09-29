@@ -7,5 +7,5 @@ CREATE TABLE contactos(
 	telefono varchar (50)
 );
 
-INSERT INTO contactos (nombre,email,telefono) VALUES ("Jose","jose@email.com","462342524");
-INSERT INTO contactos (nombre,email,telefono) VALUES ("Luis","luis@email.com","563242526");
+INSERT INTO contactos (nombre,email,telefono) VALUES ("Saul","saul_736@hotmail.com","5584485068");
+INSERT INTO contactos (nombre,email,telefono) VALUES ("Itzel","itzelpv@email.com","555476021");
