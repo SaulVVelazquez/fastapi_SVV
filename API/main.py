@@ -53,7 +53,7 @@ async def read_root ():
 
 @app.get (
 	"/contactos/{id_contacto}",
-	response_model=contactosIN,
+	response_model=contactos,
 	status_code=status.HTTP_202_ACCEPTED,
 	summary="Contacto a obtener",
 	description="Endpoint que regresa un array con el id de un solo contactos",
@@ -64,8 +64,8 @@ async def get_contactos(id_contacto:int):
 		with sqlite3.connect("API/sql/contactos.db") as connection:
 			connection.row_factory = sqlite3.Row
 			cursor = connection.cursor()
-			sql="SELECT nombre,email,telefono FROM contactos WHERE id_contacto=?;"
-			values=(id_contacto, )
+			sql="SELECT nombre,email,telefono FROM contactos WHERE id_contacto= ?;"
+			values=(id_contacto,)
 			cursor.execute(sql,values)
 			response= cursor.fetchone()
 			return response
@@ -97,4 +97,4 @@ async def get_contactos():
 		raise HTTPException(
 			status_code = status.HTTP_400_BAD_REQUEST,
 			detail = "Error al consultar los datos",
-		) 				
+		)

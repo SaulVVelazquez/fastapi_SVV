@@ -1,4 +1,4 @@
-CREATE database contactos;
+
  
 CREATE TABLE contactos(
 	id_contacto integer PRIMARY KEY AUTOINCREMENT,
