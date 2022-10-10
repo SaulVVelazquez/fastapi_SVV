@@ -64,7 +64,7 @@ async def get_contactos(id_contacto:int):
 		with sqlite3.connect("API/sql/contactos.db") as connection:
 			connection.row_factory = sqlite3.Row
 			cursor = connection.cursor()
-			sql="SELECT nombre,email,telefono FROM contactos WHERE id_contacto= ?;"
+			sql="SELECT id_contacto, nombre, email, telefono FROM contactos WHERE id_contacto = ? ;"
 			values=(id_contacto,)
 			cursor.execute(sql,values)
 			response= cursor.fetchone()
