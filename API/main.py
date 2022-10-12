@@ -98,3 +98,34 @@ async def get_contactos():
 			status_code = status.HTTP_400_BAD_REQUEST,
 			detail = "Error al consultar los datos",
 		)
+
+@app.post(
+    "/contactos/",
+    response_model = mensaje,
+    summary ="Ingresa un nuevo contacto",
+    description = "Endpoint para ingresar un Contacto nuevo"
+)
+
+async def post_contactos(contacto: ContactosIN):
+    try:
+        with sqlite3.connect("sql/contactos.db") as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            consult="SELECT email FROM contactos;"
+            existent_emails = cursor.fetchall()
+            print(existent_emails)
+            if contacto.email in existent_emails:
+              response = {"mensaje":"Email del contacto duplicado, por favor ingrese otro"}
+              return response
+            else:
+              sql="INSERT INTO contactos VALUES (NULL, ?, ?, ?);"
+              values = contacto.nombre, contacto.email, contacto.telefono
+              cursor.execute(sql, values)
+              response = {"mensaje":"Contacto registrado con éxito"}
+              return response
+			  except Exception as error:
+				print(f"Error al ingresar un dato{error.args}")
+				raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo ingresar el registro, intente de nuevo"
+        )
