@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 from fastapi import HTTPException
 from fastapi import status
+from fastapi.responses import JSONResponse
 
 class Mensaje(BaseModel):
     mensaje: str

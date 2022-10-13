@@ -15,4 +15,4 @@ def imprimir (n1:int=0,n2:int=0):
 
 imprimir(10,15)
 imprimir(-10,5)
-imprimir("4,5")                       
+imprimir("a",5)                       
