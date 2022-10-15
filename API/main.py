@@ -69,7 +69,10 @@ async def get_contactos(id_contacto:int):
             values=(id_contacto,)
             cursor.execute(sql,values)
             response= cursor.fetchone()
-            return response
+            if response == None:
+                return JSONResponse(status_code = 404, content ={"mensaje":"id_contacto no existente"})
+            else:
+                return response    
     except Exception as error:
         print(f"Error interno: {error.args}")
         raise HTTPException(
