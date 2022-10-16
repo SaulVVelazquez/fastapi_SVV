@@ -133,3 +133,49 @@ async def post_contactos(contacto: ContactosIN):
             status_code = status.HTTP_400_BAD_REQUEST,
             detail="No se pudo ingresar el registro, intente de nuevo"
         )
+
+@app.put(
+    "/contactos/{id_contacto}",
+    response_model = Mensaje,
+    status_code = status.HTTP_202_ACCEPTED,
+    description="Endpoint para actualizar un contacto"
+)
+async def put_contactos(id_contacto: int, contacto: ContactosIN):
+    try:
+        with sqlite3.connect("sql/contactos.db") as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            sql="UPDATE contactos SET nombre = ?, email = ?, telefono = ? WHERE id_contacto = ?;"
+            values = contacto.nombre, contacto.email, contacto.telefono, id_contacto
+            cursor.execute(sql, values)
+            response = {"mensaje":"Contacto actualizado con éxito"}
+            return response
+    except Exception as error:
+        print(f"Error al actualizar un dato{error.args}")
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo actualizar el registro, intente de nuevo"
+        )
+
+@app.delete(
+    "/contactos/{id_contacto}",
+    response_model = Mensaje,
+    status_code = status.HTTP_202_ACCEPTED,
+    description="Endpoint para eliminar un contacto"
+)
+async def delete_contactos(id_contacto: int):
+    try:
+        with sqlite3.connect("sql/contactos.db") as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            sql="DELETE FROM contactos WHERE id_contacto = ?;"
+            values = id_contacto
+            cursor.execute(sql, values)
+            response = {"mensaje":"Contacto eliminado con éxito"}
+            return response
+    except Exception as error:
+        print(f"Error al eliminar un dato{error.args}")
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo eliminar el registro, intente de nuevo"
+        )
