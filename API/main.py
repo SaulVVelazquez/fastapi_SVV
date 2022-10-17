@@ -105,28 +105,43 @@ async def get_contactos():
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = "Error al consultar los datos",
         )
-@app.post (
+@app.post(
     "/contactos/",
-    response_model = Contactos,
-    status_code = status.HTTP_201_CREATED,
-    summary = "Crear contacto",
-    description = "Endpoint que crea un contacto",
+    response_model = Mensaje,
+    summary ="Ingresa un nuevo contacto",
+    description = "Endpoint para ingresar un Contacto nuevo"
 )
-async def post_contactos(contacto:ContactosIN):
+
+async def post_contactos(contacto: ContactosIN):
     try:
-        with sqlite3.connect("API/sql/contactos.db") as connection:
+        with sqlite3.connect("api/sql/contactos.db") as connection:
+            connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
-            sql="INSERT INTO contactos (nombre, email, telefono) VALUES (?,?,?);"
-            values=(contacto.nombre, contacto.email, contacto.telefono, )
-            cursor.execute(sql,values)
-            connection.commit()
-            contacto.id_contacto = cursor.lastrowid
-            return contacto
+            consult=("SELECT nombre,email,telefono FROM contactos;")
+            existent_emails = cursor.fetchall()
+            existent_tell = cursor.fetchall()
+            existent_name = cursor.fetchall()
+            print(existent_emails)
+            if contacto.email in existent_emails:
+                response = {"mensaje":"Email del contacto duplicado, por favor ingrese otro"}
+                return response
+            elif contacto.telefono in existent_tell:
+                response = {"mensaje":"Telefono duplicado, por favor ingrese otro"}
+                return response     
+            elif contacto.nombre in existent_name:
+                response = {"mensaje":"Contacto duplicado, por favor ingrese otro"}
+                return response     
+            else:
+                sql="INSERT INTO contactos (nombre,email,telefono) VALUES ( ?, ?, ?);"
+                values = contacto.nombre, contacto.email, contacto.telefono
+                cursor.execute(sql, values)
+                response = {"mensaje":"Contacto registrado con éxito"}
+                return response
     except Exception as error:
-        print(f"Error interno: {error.args}")
+        print(f"Error al ingresar un dato{error.args}")
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
-            detail = "Error al crear el contacto",
+            detail="No se pudo ingresar el registro, intente de nuevo"
         )
 
 @app.put(
