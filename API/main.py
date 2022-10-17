@@ -95,43 +95,38 @@ async def get_contactos():
             cursor = connection.cursor()
             cursor.execute("SELECT id_contacto, nombre, email, telefono FROM contactos;")
             response = cursor.fetchall()
-            return response
+            if response == []:
+                return JSONResponse(status_code = 404, content = {"mensaje":"No se encontraron contactos en la BD"})
+            else:
+                return response
     except Exception as error:
         print(f"Error interno: {error.args}")
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = "Error al consultar los datos",
         )
-
-@app.post(
+@app.post (
     "/contactos/",
-    response_model = Mensaje,
-    summary ="Ingresa un nuevo contacto",
-    description = "Endpoint para ingresar un Contacto nuevo"
+    response_model = Contactos,
+    status_code = status.HTTP_201_CREATED,
+    summary = "Crear contacto",
+    description = "Endpoint que crea un contacto",
 )
-
-async def post_contactos(contacto: ContactosIN):
+async def post_contactos(contacto:ContactosIN):
     try:
-        with sqlite3.connect("sql/contactos.db") as connection:
-            connection.row_factory = sqlite3.Row
+        with sqlite3.connect("API/sql/contactos.db") as connection:
             cursor = connection.cursor()
-            consult=("SELECT email FROM contactos;")
-            existent_emails = cursor.fetchall()
-            print(existent_emails)
-            if contacto.email in existent_emails:
-                response = {"mensaje":"Email del contacto duplicado, por favor ingrese otro"}
-                return response
-            else:
-                sql="INSERT INTO contactos VALUES (NULL, ?, ?, ?);"
-                values = contacto.nombre, contacto.email, contacto.telefono
-                cursor.execute(sql, values)
-                response = {"mensaje":"Contacto registrado con éxito"}
-                return response
+            sql="INSERT INTO contactos (nombre, email, telefono) VALUES (?,?,?);"
+            values=(contacto.nombre, contacto.email, contacto.telefono, )
+            cursor.execute(sql,values)
+            connection.commit()
+            contacto.id_contacto = cursor.lastrowid
+            return contacto
     except Exception as error:
-        print(f"Error al ingresar un dato{error.args}")
+        print(f"Error interno: {error.args}")
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo ingresar el registro, intente de nuevo"
+            detail = "Error al crear el contacto",
         )
 
 @app.put(
@@ -165,14 +160,19 @@ async def put_contactos(id_contacto: int, contacto: ContactosIN):
 )
 async def delete_contactos(id_contacto: int):
     try:
-        with sqlite3.connect("sql/contactos.db") as connection:
+        with sqlite3.connect("API/sql/contactos.db") as connection:
             connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
-            sql="DELETE FROM contactos WHERE id_contacto = ?;"
-            values = id_contacto
-            cursor.execute(sql, values)
-            response = {"mensaje":"Contacto eliminado con éxito"}
-            return response
+            values = (id_contacto,)
+            cursor.execute("SELECT id_contacto FROM contactos WHERE id_contacto = ? ;", values)
+            response = cursor.fetchone()
+            if response == None:
+                return JSONResponse(status_code = 404, content ={"mensaje":"ID contacto no existe"})
+            else:
+                sql="DELETE FROM contactos WHERE id_contacto = ?;"
+                cursor.execute(sql, values)
+                response = {"mensaje":"Contacto eliminado con éxito"}
+                return response
     except Exception as error:
         print(f"Error al eliminar un dato{error.args}")
         raise HTTPException(
