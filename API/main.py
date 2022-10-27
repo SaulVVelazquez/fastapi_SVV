@@ -6,6 +6,7 @@ from pydantic import EmailStr
 from fastapi import HTTPException
 from fastapi import status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 class Mensaje(BaseModel):
     mensaje: str
@@ -194,3 +195,17 @@ async def delete_contactos(id_contacto: int):
             status_code = status.HTTP_400_BAD_REQUEST,
             detail="No se pudo eliminar el registro, intente de nuevo"
         )
+
+origins = [
+    "http://localhost:8000",
+    "http:127.0.0.1:3000",
+     "http:127.0.0.1:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
